@@ -11,11 +11,8 @@ def get_net(input_depth, NET_TYPE, pad, upsample_mode, n_channels=3, act_fun='Le
         # TODO
         net = ResNet(input_depth, 3, 10, 16, 1, nn.BatchNorm2d, False)
     elif NET_TYPE in ['skip','skip_']:
-        if NET_TYPE == 'skip':
-            get_arch = skip
-        else NET_TYPE == 'skip_':
-            get_arch = skip_
-        net = get_arch(input_depth, n_channels, num_channels_down = [skip_n33d]*num_scales if isinstance(skip_n33d, int) else skip_n33d,
+        archs = {'skip':skip,'skip_':skip_}
+        net = archs[NET_TYPE](input_depth, n_channels, num_channels_down = [skip_n33d]*num_scales if isinstance(skip_n33d, int) else skip_n33d,
                                             num_channels_up =   [skip_n33u]*num_scales if isinstance(skip_n33u, int) else skip_n33u,
                                             num_channels_skip = [skip_n11]*num_scales if isinstance(skip_n11, int) else skip_n11, 
                                             upsample_mode=upsample_mode, downsample_mode=downsample_mode,
