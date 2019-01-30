@@ -119,3 +119,20 @@ def skip_(
     modules['end'].append(endblock)
     model.opwise_modules = modules
     return model
+
+def multi_sequential_parameters(seq_list):
+    params = []
+    for s in seq_list:
+        params.extend(list(s.parameters()))
+    return params
+def parameters_till(net,scale,end=False):
+    d = multi_sequential_parameters(net.opwise_modules['down'])
+    up_coarse_to_fine = reversed(net.opwise_modules['up'])
+    skip_coarse_to_fine = reversed(net.opwise_modules['skip'])
+    u = multi_sequential_parameters(net.opwise_modules['up'][:scale+1])
+    s = multi_sequential_parameters(net.opwise_modules['skip'][:scale+1])
+    e = []
+    if end:
+        e = multi_sequential_parameters(net.opwise_modules['end'])
+    p = d + u + s + e
+    return p
