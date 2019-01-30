@@ -55,26 +55,26 @@ def skip_(
         skip = nn.Sequential()
 
         if num_channels_skip[i] != 0:
-            model_tmp.add(models.common.Concat(1, skip, deeper))
+            model_tmp.add(Concat(1, skip, deeper))
         else:
             model_tmp.add(deeper)
         
-        model_tmp.add(models.common.bn(num_channels_skip[i] + (num_channels_up[i + 1] if i < last_scale else num_channels_down[i])))
+        model_tmp.add(bn(num_channels_skip[i] + (num_channels_up[i + 1] if i < last_scale else num_channels_down[i])))
 
         if num_channels_skip[i] != 0:
-            skip.add(models.common.conv(input_depth, num_channels_skip[i], filter_skip_size, bias=need_bias, pad=pad))
-            skip.add(models.common.bn(num_channels_skip[i]))
-            skip.add(models.common.act(act_fun))
+            skip.add(conv(input_depth, num_channels_skip[i], filter_skip_size, bias=need_bias, pad=pad))
+            skip.add(bn(num_channels_skip[i]))
+            skip.add(act(act_fun))
             
         # skip.add(Concat(2, GenNoise(nums_noise[i]), skip_part))
 
-        downblock.add(models.common.conv(input_depth, num_channels_down[i], filter_size_down[i], 2, bias=need_bias, pad=pad, downsample_mode=downsample_mode[i]))
-        downblock.add(models.common.bn(num_channels_down[i]))
-        downblock.add(models.common.act(act_fun))
+        downblock.add(conv(input_depth, num_channels_down[i], filter_size_down[i], 2, bias=need_bias, pad=pad, downsample_mode=downsample_mode[i]))
+        downblock.add(bn(num_channels_down[i]))
+        downblock.add(act(act_fun))
 
-        downblock.add(models.common.conv(num_channels_down[i], num_channels_down[i], filter_size_down[i], bias=need_bias, pad=pad))
-        downblock.add(models.common.bn(num_channels_down[i]))
-        downblock.add(models.common.act(act_fun))
+        downblock.add(conv(num_channels_down[i], num_channels_down[i], filter_size_down[i], bias=need_bias, pad=pad))
+        downblock.add(bn(num_channels_down[i]))
+        downblock.add(act(act_fun))
         
 #         deeper.add('down_'+str(i) ,downblock)
         deeper.add(downblock)
@@ -91,15 +91,15 @@ def skip_(
         deeper.add(nn.Upsample(scale_factor=2, mode=upsample_mode[i]))
         upblock = nn.Sequential()
         
-        upblock.add(models.common.conv(num_channels_skip[i] + k, num_channels_up[i], filter_size_up[i], 1, bias=need_bias, pad=pad))
-        upblock.add(models.common.bn(num_channels_up[i]))
-        upblock.add(models.common.act(act_fun))
+        upblock.add(conv(num_channels_skip[i] + k, num_channels_up[i], filter_size_up[i], 1, bias=need_bias, pad=pad))
+        upblock.add(bn(num_channels_up[i]))
+        upblock.add(act(act_fun))
 
 
         if need1x1_up:
-            upblock.add(models.common.conv(num_channels_up[i], num_channels_up[i], 1, bias=need_bias, pad=pad))
-            upblock.add(models.common.bn(num_channels_up[i]))
-            upblock.add(models.common.act(act_fun))
+            upblock.add(conv(num_channels_up[i], num_channels_up[i], 1, bias=need_bias, pad=pad))
+            upblock.add(bn(num_channels_up[i]))
+            upblock.add(act(act_fun))
         
 #         model_tmp.add('up_'+str(i),upblock)
         model_tmp.add(upblock)
@@ -112,7 +112,7 @@ def skip_(
         modules['down'].append(downblock)
     
     endblock = nn.Sequential()
-    endblock.add(models.common.conv(num_channels_up[0], num_output_channels, 1, bias=need_bias, pad=pad))
+    endblock.add(conv(num_channels_up[0], num_output_channels, 1, bias=need_bias, pad=pad))
     if need_sigmoid:
         endblock.add(nn.Sigmoid())
     model.add(endblock)
