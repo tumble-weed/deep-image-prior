@@ -1,5 +1,5 @@
 from .skip import skip
-from .skip_ import skip_
+from .skip_ import skip__
 from .texture_nets import get_texture_nets
 from .resnet import ResNet
 from .unet import UNet
