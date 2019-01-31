@@ -125,14 +125,19 @@ def multi_sequential_parameters(seq_list):
     for s in seq_list:
         params.extend(list(s.parameters()))
     return params
-def parameters_till(net,scale,end=False):
+def upsample_parameters_till(net,scale,end=False):
     d = multi_sequential_parameters(net.opwise_modules['down'])
-    up_coarse_to_fine = reversed(net.opwise_modules['up'])
-    skip_coarse_to_fine = reversed(net.opwise_modules['skip'])
-    u = multi_sequential_parameters(net.opwise_modules['up'][:scale+1])
-    s = multi_sequential_parameters(net.opwise_modules['skip'][:scale+1])
+    up_coarse_to_fine = net.opwise_modules['up'][::-1]
+    skip_coarse_to_fine = net.opwise_modules['skip'][::-1]
+    u = multi_sequential_parameters(up_coarse_to_fine[:scale+1])
+    s = multi_sequential_parameters(skip_coarse_to_fine[:scale+1])
+#     s = []
     e = []
     if end:
         e = multi_sequential_parameters(net.opwise_modules['end'])
     p = d + u + s + e
+    return p
+def downsample_parameters_till(net,scale,end=False):
+    d = multi_sequential_parameters(net.opwise_modules['down'])[:scale+1]
+    p = d
     return p
